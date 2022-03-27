@@ -1,19 +1,3 @@
-// asks for input and stores input in the variable :playerName
-var playerName = window.prompt("whats your name?");
-var playerHealth = 40;
-var playerAttack = 10;
-var playerMoney = 10;
-
-// console.log(playerName + " has " + playerHealth + " health points " + playerAttack + " attack power.");
-window.alert(" Hi " + playerName + " welcome to the game ");
-
-var enemyNames = ["fear", "too-much-thinking", "self-doubt", "anxiety"];
-// displays the length of the array = 4
-// console.log(enemyNames.length);
-var enemyHealth = 20;
-var enemyAttack = 12;
-// console.log(enemyNames + " has " + enemyHealth + " health points " + enemyAttack + " attack points");
-
 // PSEUDOCODE
 // Game States
 // WIN - Player robot has defeated all enemy robots
@@ -32,9 +16,9 @@ var enemyAttack = 12;
 // if yes, present them with options
     // create the options (functions)
 
-var Fight = function(enemyName) {
+var Fight = function(enemy) {
 
-    while(playerHealth > 0 && enemyHealth > 0) {
+    while(player.health > 0 && enemy.health > 0) {
 
         var promptFight = window.prompt("do you want to fight or skip?");
         // console.log(promptFight);
@@ -43,40 +27,40 @@ var Fight = function(enemyName) {
             var confirmSkip = window.confirm("do you really want to skip the fight?");
     
             if (confirmSkip) {
-                window.alert(playerName + " is penalized bcus " + playerName + " has chosen to skip the fight");
-                playerMoney = Math.max(0, playerMoney - 2);
-                window.alert("your money is now " + playerMoney + " . See you next time.");
-                console.log("your money is now " + playerMoney + " . See you next time.");
+                window.alert(player.name + " is penalized bcus " + player.name + " has chosen to skip the fight");
+                player.money = Math.max(0, player.money - 2);
+                window.alert("your money is now " + player.money + " . See you next time.");
+                console.log("your money is now " + player.money + " . See you next time.");
                 break;
             }
         }
             
         // generate random damage value based on player's attack power
-        var damage = randomNumber(playerAttack - 3, playerAttack);
+        var damage = randomNumber(player.attack - 3, player.attack);
         // checking if enemy is still alive
-        enemyHealth = Math.max(0, enemyHealth - damage);
+        enemy.health = Math.max(0, enemy.health - damage);
         
-        if (enemyHealth <= 0) {
-            window.alert(enemyName + " is dead");
-            playerMoney = playerMoney + 5;
+        if (enemy.health <= 0) {
+            window.alert(enemy.name + " is dead");
+            player.money = player.money + 5;
             break;
         } else {
-            window.alert(enemyName + " is still alive with " + enemyHealth + " left");
+            window.alert(enemy.name + " is still alive with " + enemy.health + " left");
         }
-        console.log(playerName + " attacked " + enemyName + " . " + enemyName + " has " + enemyHealth);
+        console.log(player.name + " attacked " + enemy.name + " . " + enemy.name + " has " + enemy.health);
         
         // generate random damage value based on enemy's attack power
-        var damage2 = randomNumber(enemyAttack - 3, enemyAttack);
+        var damage2 = randomNumber(enemy.attack - 3, enemy.attack);
         // checking player
-        playerHealth = Math.max(0, playerHealth - damage2);
+        player.health = Math.max(0, player.health - damage2);
         
-        if (playerHealth <= 0) {
-            window.alert(playerName + " is died");
+        if (player.health <= 0) {
+            window.alert(player.name + " is died");
             break;
         } else {
-            window.alert(playerName + " can still fight with " + playerHealth + " left");
+            window.alert(player.name + " can still fight with " + player.health + " left");
         }
-        console.log(enemyName + " attacked " + playerName + " . " + playerName + " has " + playerHealth);
+        console.log(enemy.name + " attacked " + player.name + " . " + player.name + " has " + player.health);
         // } else {
         //     window.alert("please enter a valid response");
         // }
@@ -88,12 +72,11 @@ var Fight = function(enemyName) {
 var startGame = function() {
 
     // reset player stats
-    playerHealth = 40;
-    playerAttack = 10;
-    playerMoney = 5;
+    // calling the function in the player object
+    player.reset();
 
     // for loop
-    for (var i = 0; i < enemyNames.length; i++) {
+    for (var i = 0; i < enemies.length; i++) {
         // displays each enemy name
         // console.log(enemyNames[i]);
         // diplays each enemy index
@@ -102,17 +85,17 @@ var startGame = function() {
         // console.log(enemyNames[i] + " is at " + i + " index");
     
         // check if player is still alive
-        if (playerHealth > 0) {
+        if (player.health > 0) {
             window.alert("Welcome to the FIGHT! Round " + (i + 1));
             
-            var pickedEnemy = enemyNames[i];
+            var pickedEnemiesObj = enemies[i];
 
-            enemyHealth = randomNumber(10, 20);
+            pickedEnemiesObj.health = randomNumber(10, 20);
             // debugger;
-            Fight(pickedEnemy);
+            Fight(pickedEnemiesObj);
 
             // if we're not at the last enemy in the array
-            if (playerHealth > 0 && i < enemyNames.length - 1) {
+            if (player.health > 0 && i < enemies.length - 1) {
                 // ask if player wants to shop
                 var confirmShop = window.confirm('do you want to enter the shop?');
 
@@ -131,7 +114,7 @@ var startGame = function() {
 
 // End game function
 var endGame = function () {
-    if (playerHealth > 0) {
+    if (player.health > 0) {
         window.alert("Great job, you survived")
     } else {
         window.alert("You lost. See your stats next");
@@ -153,25 +136,11 @@ var shop = function () {
     switch(shopOptions) {
         case "REFILL":
         case "refill":
-            if (playerMoney >= 5) {
-                window.alert('refilling your health');
-                // increase health and decrease money
-                playerHealth = playerHealth + 10;
-                playerMoney = playerMoney - 2;
-            } else {
-                window.alert('not enough money');
-            }
+            player.refillHealth();
             break;
         case "UPGRADE":
         case "upgrade":
-            if (playerMoney >= 5) {
-                window.alert('upgrading your attack');
-                // increase attack and decrease money
-                playerAttack = playerAttack + 10;
-                playerMoney = playerMoney - 2;
-            } else {
-                window.alert('not enough money');
-            }
+            player.upgradeAttack();
             break;
         case "LEAVE":
         case "leave":
@@ -191,5 +160,59 @@ var randomNumber = function(min, max) {
 
     return value;
 };
+
+// asks for input and stores input in the variable :playerName
+// player variables changed to objects for OOP
+var player = {
+    name: window.prompt("whats your name?"),
+    health: 40,
+    attack: 10,
+    money: 10,
+    reset: function() {
+        this.health = 40;
+        this.attack = 10;
+        this.money = 10;
+    },
+    refillHealth: function() {
+        if (this.money >= 5) {
+            window.alert('refilling your health by 10 for $2');
+            this.health += 10;
+            this.money -= 2;
+        } else {
+            window.alert('insufficient funds!');
+        }
+    },
+    upgradeAttack: function() {
+        if (this.money >= 5) {
+            window.alert('refilling your attack power by 10 for $2')
+            this.attack += 10;
+            this.money -= 2;
+        } else {
+            window.alert('insufficient funds!');
+        }
+    }
+};
+// console.log(playerName + " has " + playerHealth + " health points " + playerAttack + " attack power.");
+window.alert(" Hi " + player.name + " welcome to the game ");
+
+// changing enemy to objects for OOP
+var enemies = [
+    {
+        name: "fear",
+        attack: randomNumber(10, 14)
+    },
+    {
+        name: "too-much-thinking",
+        attack: randomNumber(10, 14)
+    },
+    {
+        name: "self-doubt",
+        attack: randomNumber(10, 14)
+    },
+    {
+        name: "anxiety",
+        attack: randomNumber(10, 14)
+    }
+];
 
 startGame();
